@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hệ thống thi trắc nghiệm online</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;0,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g1:#1a7a4a;--g2:#22a86a;--g3:#16c172;
+  --grad:linear-gradient(135deg,var(--g1),var(--g2),var(--g3));
+  --grad2:linear-gradient(135deg,#0f5c38,var(--g1));
+  --bg:#f0faf4;--card:#fff;--line:#b6e0c8;--ink:#0d2b1a;--mute:#4a7a5e;
+  --bad:#d32f2f;--sel:#d4f5e4;--selb:#1a7a4a;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;
+  --bg:#0b1a11;--card:#122018;--line:#1e4030;--ink:#d4f0e0;--mute:#6aaa86;--sel:#1a3828;--selb:#22a86a}}
+:root[data-theme="dark"]{color-scheme:dark;
+  --bg:#0b1a11;--card:#122018;--line:#1e4030;--ink:#d4f0e0;--mute:#6aaa86;--sel:#1a3828;--selb:#22a86a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "Be Vietnam Pro",system-ui,sans-serif}
+
+/* ── Header ── */
+.site-header{background:var(--grad);color:#fff;text-align:center;padding:18px 16px 16px;position:relative;overflow:hidden}
+.site-header::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.site-header h1{margin:0;font-size:15px;font-weight:800;letter-spacing:.3px;position:relative}
+.site-header small{display:block;font-size:12px;font-weight:600;opacity:.85;margin-top:2px;position:relative}
+.badge{display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:2px 10px;font-size:11px;margin-top:6px;position:relative}
+
+main{max-width:980px;margin:0 auto;padding:14px}
+
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:0 2px 12px rgba(26,122,74,.07)}
+.card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--g1);text-align:center;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid var(--line)}
+
+/* ── Top layout ── */
+.top{display:grid;grid-template-columns:180px 1fr;gap:14px;margin-bottom:14px}
+.qr-wrap{background:var(--card);border:2px dashed var(--line);border-radius:12px;display:grid;place-items:center;min-height:180px;color:var(--mute);font-size:12px;text-align:center;padding:8px}
+.qr-wrap img,.qr-wrap canvas{border-radius:6px}
+
+/* ── Info list ── */
+ul.info{list-style:none;margin:0;padding:0;font-size:13.5px;display:grid;gap:7px}
+ul.info li{display:flex;align-items:center;gap:6px}
+ul.info li::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--grad);flex:none}
+ul.info b{color:var(--g1)}
+
+/* ── Inputs ── */
+input,textarea,select{font:inherit;border:1.5px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--card);color:var(--ink);transition:border-color .15s}
+input:focus,textarea:focus{border-color:var(--g2);outline:none;box-shadow:0 0 0 3px rgba(34,168,106,.18)}
+li input[type=number]{width:68px}
+
+/* ── Buttons ── */
+button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:10px 14px;cursor:pointer;transition:filter .15s,transform .1s}
+button:active:not(:disabled){transform:scale(.97)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:var(--grad);color:#fff;box-shadow:0 3px 12px rgba(26,122,74,.3)}
+.btn-primary:hover:not(:disabled){filter:brightness(1.08)}
+.btn-danger{background:linear-gradient(135deg,#c62828,#e53935);color:#fff}
+.btn-outline{background:transparent;color:var(--g1);border:2px solid var(--g1)}
+.btn-outline:hover:not(:disabled){background:var(--sel)}
+
+/* ── Action bar ── */
+.btns{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.btns button{font-size:13px;padding:11px 8px;border-radius:10px}
+
+/* ── Panel ── */
+.panel-box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px;display:grid;gap:10px}
+.panel-box textarea{width:100%;min-height:170px;font-size:13px;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* ── Msg ── */
+.msg{font-size:13px;min-height:20px;margin:0 0 10px;color:var(--mute);padding:0 2px}
+.msg.ok{color:var(--g1)}
+.msg.err{color:var(--bad)}
+
+/* ── Table ── */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:0 2px 8px rgba(26,122,74,.06)}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:560px}
+thead tr{background:var(--grad2)}
+th{color:#fff;padding:9px 7px;text-align:center;font-weight:700;font-size:12.5px;letter-spacing:.3px}
+td{padding:8px 7px;border-top:1px solid var(--line);text-align:center}
+td.l{text-align:left;font-weight:600}
+tr:hover td{background:var(--sel)}
+.empty{color:var(--mute);padding:20px;text-align:center;font-style:italic}
+.foot{display:flex;justify-content:flex-end;margin-top:14px;gap:8px}
+
+/* ── Học sinh – khung chung ── */
+.stu{max-width:520px;margin:0 auto;display:grid;gap:14px}
+
+/* ── Màn hình join ── */
+.join-card{text-align:center;padding:32px 24px}
+.join-icon{font-size:52px;margin-bottom:4px}
+.join-card h2{font-size:20px;font-weight:800;margin:0 0 4px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.join-card .sub{font-size:13px;color:var(--mute);margin:0 0 20px}
+.join-card input{width:100%;font-size:16px;padding:12px 14px;border-radius:10px;margin-bottom:10px}
+.join-card .btn-primary{width:100%;font-size:15px;padding:13px}
+
+/* ── Màn hình chờ / thông báo ── */
+.info-card{text-align:center;padding:40px 20px}
+.info-card .icon{font-size:56px;margin-bottom:8px}
+.info-card h2{font-size:18px;font-weight:700;margin:0 0 8px;color:var(--g1)}
+.info-card p{color:var(--mute);margin:0;font-size:14px}
+
+/* ── Màn hình làm bài ── */
+.quiz-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--grad);border-radius:10px;color:#fff;font-weight:700}
+.quiz-header .prog{font-size:13px;opacity:.9}
+.timer{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px}
+.timer.warn{color:#ffeb3b}
+.q-card{padding:20px}
+.q-text{font-size:16px;font-weight:600;margin:0 0 16px;line-height:1.5}
+.opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);color:var(--ink);border:2px solid var(--line);padding:13px 14px;margin-bottom:9px;font-weight:500;border-radius:10px;transition:all .15s}
+.opt:hover:not(:disabled){border-color:var(--g2);background:var(--sel)}
+.opt.on{background:var(--sel);border-color:var(--selb)}
+.opt i{font-style:normal;font-weight:800;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--bg);flex:none;font-size:13px;transition:all .15s}
+.opt.on i{background:var(--grad);color:#fff;box-shadow:0 2px 8px rgba(26,122,74,.4)}
+.quiz-nav{display:flex;gap:10px}.quiz-nav button{flex:1;padding:12px}
+.dots{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.dots button{width:34px;height:34px;padding:0;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:7px;font-size:12px;font-weight:600}
+.dots .d{background:var(--grad);color:#fff;border-color:transparent}
+.dots .c{box-shadow:0 0 0 2.5px var(--g1)}
+
+/* ── Màn hình kết quả ── */
+.result-card{text-align:center;padding:36px 20px}
+.score-ring{width:120px;height:120px;border-radius:50%;background:var(--grad);display:grid;place-items:center;margin:0 auto 16px;box-shadow:0 6px 24px rgba(26,122,74,.35)}
+.score-ring span{font-size:32px;font-weight:800;color:#fff;line-height:1}
+.score-ring small{font-size:13px;color:rgba(255,255,255,.8);display:block}
+.result-card h2{font-size:18px;font-weight:700;margin:0 0 6px}
+.result-card .diem{font-size:28px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* ── Đăng nhập ── */
+.login-card{max-width:360px;margin:60px auto;padding:36px 28px;text-align:center}
+.login-card h2{font-size:20px;font-weight:800;margin:0 0 6px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.login-card p{color:var(--mute);font-size:13px;margin:0 0 20px}
+.login-card input{width:100%;padding:12px 14px;border-radius:10px;font-size:15px;margin-bottom:10px}
+.login-card button{width:100%;padding:13px;font-size:15px}
+
+@media(max-width:640px){
+  .top{grid-template-columns:1fr}
+  .btns{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="site-header">
+  <h1>🎓 HỆ THỐNG THI TRẮC NGHIỆM ONLINE</h1>
+  <small>Tổ chức kiểm tra đánh giá trên thiết bị di động</small>
+  <div class="badge">✦ Dành cho giáo viên &amp; học sinh ✦</div>
+</div>
+<main id="app"><p class="empty">Đang tải…</p></main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const $=id=>document.getElementById(id),app=$('app');
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=ms=>{ms=Math.max(0,ms);const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
+let tok=ls.get('tok'),off=0,msg='';
+async function api(p,b){
+  const h={'Content-Type':'application/json'};if(tok)h['x-token']=tok;
+  const r=await fetch(p,{method:b?'POST':'GET',headers:h,body:b?JSON.stringify(b):undefined});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){const e=new Error(j.error||('Lỗi '+r.status));e.status=r.status;throw e}
+  return j;
+}
+const note=(t,cls='')=>{msg=t;const m=$('msg');if(m){m.textContent=t;m.className='msg '+(cls||'')}};
+const waitScreen=(icon,title,body)=>app.innerHTML=`<div class="stu"><div class="card info-card"><div class="icon">${icon}</div><h2>${title}</h2><p>${body}</p></div></div>`;
+if(location.pathname.startsWith('/teacher'))tInit();else sInit();
+
+/* =================== GIÁO VIÊN =================== */
+let T=null,tkey='',panel='',started=false;
+function tInit(){if(!tok)return login();tPoll().then(()=>{if(!started){started=true;setInterval(tPoll,2000);setInterval(table,1000)}}).catch(()=>login())}
+function login(){
+  app.innerHTML=`<div class="card login-card">
+    <div style="font-size:48px;margin-bottom:8px">🔐</div>
+    <h2>Đăng nhập</h2><p>Dành cho giáo viên quản lý phòng thi</p>
+    <input id="pw" type="password" placeholder="Nhập mật khẩu" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-primary" onclick="doLogin()">Đăng nhập</button>
+    <p class="msg" id="msg" style="margin-top:10px"></p></div>`;
+}
+async function doLogin(){try{const r=await api('/api/login',{pass:$('pw').value});tok=r.token;ls.set('tok',tok);location.reload()}catch(e){note(e.message,'err')}}
+async function tPoll(){
+  try{T=await api('/api/t/state')}catch(e){if(e.status===401){ls.del('tok');tok=null;return login()}throw e}
+  off=T.now-Date.now();const e=T.exam,k=e.id+e.status+e.questions.length;
+  if(k!==tkey){tkey=k;tShell()}table();
+}
+async function act(p,b,ok){try{await api(p,b||{});if(ok)note(ok,'ok');await tPoll()}catch(e){note(e.message,'err')}}
+function tShell(){
+  const e=T.exam,n=e.questions.length,st=e.status,dis=st!=='draft'?'disabled':'';
+  const stLabel={draft:'⬜ Chưa bắt đầu',running:'🟢 Đang thi',ended:'🔴 Đã kết thúc'}[st]||st;
+  app.innerHTML=`
+  <div class="top">
+    <div class="qr-wrap" id="qr"><span>📷<br>Bấm "Tạo mã QR"<br>để hiện mã</span></div>
+    <div class="card">
+      <div class="card-title">📋 Thông tin ca thi &amp; cấu hình đề</div>
+      <ul class="info">
+        <li>Trạng thái: <b>${stLabel}</b></li>
+        <li>Lớp:&nbsp;<input value="${esc(e.cls)}" placeholder="Nhập lớp" size="8" ${dis} onchange="act('/api/t/config',{cls:this.value,duration:$('dur').value})"> &nbsp;Đã vào phòng: <b id="cnt">0</b> thí sinh</li>
+        <li>Địa chỉ: <b>${esc(location.origin)}/</b></li>
+        <li>Số câu hỏi: <b>${n} câu</b> trắc nghiệm</li>
+        <li>Thời gian: <input id="dur" type="number" min="1" value="${e.duration}" ${dis} onchange="act('/api/t/config',{duration:this.value})"> phút</li>
+      </ul>
+    </div>
+  </div>
+  <div class="btns">
+    <button class="btn-primary" onclick="qr()">📷 Tạo mã QR phòng thi</button>
+    <button class="btn-outline" onclick="panel=panel==='imp'?'':'imp';tShell()" ${dis}>📥 Import ngân hàng đề</button>
+    <button class="btn-primary" onclick="${st==='running'?"confirm('Kết thúc bài thi cho tất cả thí sinh?')&&act('/api/t/end')":"act('/api/t/start')"}" ${st==='ended'||!n?'disabled':''}>${st==='running'?'🛑 Kết thúc bài thi':st==='ended'?'✅ Đã kết thúc':'🚀 Bắt đầu làm bài'}</button>
+    <button class="btn-outline" onclick="csv()">💾 Tải kết quả thi</button>
+  </div>
+  ${panel==='imp'&&st==='draft'?`<div class="panel-box">
+    <b>📄 Dán câu hỏi theo mẫu, hoặc chọn tệp .txt</b>
+    <textarea id="bank" placeholder="Câu 1: Thủ đô của Việt Nam là?&#10;A. Huế&#10;B. Hà Nội&#10;C. Đà Nẵng&#10;D. Cần Thơ&#10;Đáp án: B"></textarea>
+    <div class="row"><input type="file" accept=".txt,text/plain" onchange="readF(this)">
+    <button class="btn-primary" onclick="imp()">Nạp câu hỏi</button>
+    <button class="btn-danger" onclick="confirm('Xóa toàn bộ câu hỏi?')&&act('/api/t/clear',0,'Đã xóa câu hỏi.')">Xóa hết</button></div>
+  </div>`:''}
+  <p class="msg" id="msg">${esc(msg)}</p>
+  <div class="tw"><table>
+    <thead><tr><th>TT</th><th>Họ và tên</th><th>Thời gian còn lại</th><th>Vi phạm</th><th>Đã nộp</th><th>Điểm số</th></tr></thead>
+    <tbody id="tb"></tbody>
+  </table></div>
+  <div class="foot"><button class="btn-danger" onclick="confirm('Tạo ca thi mới? Câu hỏi và kết quả hiện tại sẽ bị xóa.')&&act('/api/t/reset',0,'Đã tạo ca thi mới.')">🔄 Tạo mới</button></div>`;
+}
+function qr(){
+  const el=$('qr'),u=location.origin+'/';el.innerHTML='';
+  if(typeof QRCode==='undefined'){el.innerHTML='<span>Không tải được thư viện QR</span>';return}
+  new QRCode(el,{text:u,width:154,height:154,colorDark:'#0f5c38',colorLight:'#ffffff'});
+  navigator.clipboard&&navigator.clipboard.writeText(u).then(()=>note('✅ Đã sao chép link phòng thi.','ok'),()=>{});
+}
+function table(){
+  const tb=$('tb');if(!tb||!T)return;
+  const e=T.exam,S=T.students;$('cnt').textContent=S.length;
+  if(!S.length){tb.innerHTML='<tr><td colspan="6" class="empty">Chưa có thí sinh kết nối</td></tr>';return}
+  const left=fmt(e.startedAt+e.duration*60000-(Date.now()+off));
+  tb.innerHTML=S.slice().sort((a,b)=>a.joinedAt-b.joinedAt).map((r,i)=>`<tr>
+    <td>${i+1}</td><td class="l">${esc(r.name)}</td>
+    <td>${r.submitted?'<span style="color:var(--g1);font-weight:700">Đã nộp</span>':e.status==='running'?left:'—'}</td>
+    <td style="color:${r.violations?'var(--bad)':'inherit'};font-weight:${r.violations?700:400}">${r.violations}</td>
+    <td>${r.submitted?'<span style="color:var(--g1)">✓</span>':'—'}</td>
+    <td>${r.submitted?`<b>${r.score}/${r.total}</b> <span style="color:var(--mute)">(${(r.score/r.total*10).toFixed(1)})</span>`:'—'}</td></tr>`).join('');
+}
+function parseBank(t){
+  const qs=[];let cur=null;const push=()=>{if(cur&&cur.o.length>=2&&cur.o.length<=4&&cur.a>=0&&cur.a<cur.o.length)qs.push(cur);cur=null};
+  for(const raw of t.split(/\r?\n/)){
+    const l=raw.trim();if(!l)continue;let m;
+    if(cur&&(m=l.match(/^(?:đáp án|dap an|answer|ans)\s*[:.\-]?\s*([A-Da-d])/i))){cur.a='ABCD'.indexOf(m[1].toUpperCase());continue}
+    if(cur&&(m=l.match(/^(\*?)([A-Da-d])[.)]\s*(.+)/))){cur.o.push(m[3]);if(m[1])cur.a=cur.o.length-1;continue}
+    const isQ=/^(câu|cau|question)\s*\d*\s*[:.)]/i.test(l);
+    if(isQ||!cur||cur.a>=0){push();cur={q:l.replace(/^(câu|cau|question)\s*\d*\s*[:.)]\s*/i,''),o:[],a:-1};continue}
+    if(!cur.o.length)cur.q+=' '+l;
+  }
+  push();return qs;
+}
+function readF(i){const f=i.files[0];if(f)f.text().then(t=>{$('bank').value=t})}
+function imp(){
+  const qs=parseBank($('bank').value);
+  if(!qs.length)return note('⚠️ Không đọc được câu hỏi nào. Kiểm tra định dạng: cần có các dòng A. B. C. D. và dòng "Đáp án: X".','err');
+  act('/api/t/import',{questions:qs},'✅ Đã nạp '+qs.length+' câu.');
+}
+async function csv(){
+  try{
+    const r=await fetch('/api/t/csv',{headers:{'x-token':tok}});if(!r.ok)throw new Error('Không tải được');
+    const a=document.createElement('a');a.href=URL.createObjectURL(await r.blob());a.download='ket-qua-thi-'+(T.exam.cls||'lop')+'.csv';a.click();
+  }catch(e){note('❌ '+e.message,'err')}
+}
+
+/* =================== HỌC SINH =================== */
+let sid=ls.get('sid'),R=null,stage='',curId=0,ans=[],qi=0,Q=[],sStarted=false;
+function sInit(){sPoll();if(!sStarted){sStarted=true;setInterval(sPoll,2000);setInterval(tick,1000)}}
+async function sPoll(){
+  let r;try{r=await api('/api/state?sid='+encodeURIComponent(sid||''))}catch(e){return}
+  R=r;off=r.now-Date.now();const e=r.exam,m=r.me;
+  const s=!e.n?'none':m?(m.submitted?'result':e.status==='running'?'quiz':'wait'):(e.status==='ended'?'closed':'join');
+  if(s!==stage||e.id!==curId){
+    if(s==='join'&&$('nm')&&stage==='join'){curId=e.id;return}
+    stage=s;curId=e.id;
+    if(s==='quiz'){Q=r.questions||[];ans=m.answers.slice();qi=0}
+    sRender();
+  }
+}
+function sRender(){
+  const e=R.exam,m=R.me;
+  if(stage==='none')return waitScreen('📭','Chưa có đề thi','Giáo viên đang chuẩn bị phòng thi.<br>Trang sẽ tự cập nhật khi có đề.');
+  if(stage==='closed')return waitScreen('🔒','Phòng thi đã đóng','Ca thi này đã kết thúc.');
+  if(stage==='wait')return waitScreen('⏳','Xin chào, '+esc(m.name)+' 👋','Bạn đã vào phòng thi thành công.<br>Chờ giáo viên bấm <b>Bắt đầu làm bài</b>, trang sẽ tự chuyển.');
+  if(stage==='result')return result();
+  if(stage==='quiz')return quiz();
+  app.innerHTML=`<div class="stu">
+    <div class="card join-card">
+      <div class="join-icon">✏️</div>
+      <h2>Vào phòng thi${e.cls?' — Lớp '+esc(e.cls):''}</h2>
+      <p class="sub">${e.n} câu trắc nghiệm &nbsp;·&nbsp; ${e.duration} phút</p>
+      <input id="nm" placeholder="Nhập họ và tên của bạn" autocomplete="name" maxlength="60" onkeydown="if(event.key==='Enter')join()">
+      <button class="btn-primary" onclick="join()">Vào phòng thi →</button>
+      <p class="msg" id="msg"></p>
+    </div>
+  </div>`;
+}
+async function join(){
+  const name=$('nm').value.trim();if(!name)return $('nm').focus();
+  try{const r=await api('/api/join',{name});sid=r.sid;ls.set('sid',sid);stage='';sPoll()}catch(e){note(e.message,'err')}
+}
+function quiz(){
+  const e=R.exam,n=Q.length,q=Q[qi];
+  const left=e.startedAt+e.duration*60000-(Date.now()+off);
+  const warn=left<60000;
+  app.innerHTML=`<div class="stu">
+    <div class="quiz-header">
+      <span class="prog">Câu ${qi+1} / ${n}</span>
+      <span class="timer${warn?' warn':''}" id="tm">${fmt(left)}</span>
+    </div>
+    <div class="card q-card">
+      <p class="q-text">${esc(q.q)}</p>
+      ${q.o.map((o,k)=>`<button class="opt ${ans[qi]===k?'on':''}" onclick="pick(${k})"><i>${'ABCD'[k]}</i><span>${esc(o)}</span></button>`).join('')}
+    </div>
+    <div class="quiz-nav">
+      <button class="btn-outline" onclick="go(${qi-1})" ${qi?'':'disabled'}>← Câu trước</button>
+      ${qi<n-1?`<button class="btn-primary" onclick="go(${qi+1})">Câu sau →</button>`:'<button class="btn-primary" onclick="finish()">✅ Nộp bài</button>'}
+    </div>
+    <div class="dots">${ans.map((v,i)=>`<button class="${v>=0?'d':''} ${i===qi?'c':''}" onclick="go(${i})">${i+1}</button>`).join('')}</div>
+  </div>`;
+}
+function pick(k){ans[qi]=k;quiz();api('/api/answer',{sid,answers:ans}).catch(()=>{})}
+function go(i){qi=i;quiz()}
+async function finish(auto){
+  const left=ans.filter(v=>v<0).length;
+  if(!auto&&left&&!confirm('Còn '+left+' câu chưa trả lời. Vẫn nộp bài?'))return;
+  stage='busy';
+  try{await api('/api/submit',{sid,answers:ans})}catch(e){}
+  stage='';sPoll();
+}
+function result(){
+  const m=R.me,pct=(m.score/m.total*10).toFixed(2);
+  const stars=m.score/m.total>=.8?'🌟🌟🌟':m.score/m.total>=.5?'⭐⭐':'⭐';
+  app.innerHTML=`<div class="stu"><div class="card result-card">
+    <div class="score-ring"><span>${m.score}</span><small>/ ${m.total} câu</small></div>
+    <h2>Đã nộp bài thành công ${stars}</h2>
+    <div class="diem">${pct} <span style="font-size:18px;font-weight:600;-webkit-text-fill-color:var(--mute)">/ 10</span></div>
+    <p style="color:var(--mute);margin:8px 0 0;font-size:14px">${esc(m.name)}</p>
+  </div></div>`;
+}
+function tick(){
+  if(stage!=='quiz'||!R)return;
+  const e=R.exam,left=e.startedAt+e.duration*60000-(Date.now()+off),t=$('tm');
+  if(t){t.textContent=fmt(left);t.className='timer'+(left<60000?' warn':'')}
+  if(left<=0)finish(true);
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&stage==='quiz')api('/api/violation',{sid}).catch(()=>{})});
+</script>
+</body>
+</html>

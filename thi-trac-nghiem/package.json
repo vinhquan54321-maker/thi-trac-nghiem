@@ -1,0 +1,9 @@
+{
+  "name": "thi-trac-nghiem",
+  "version": "1.0.0",
+  "description": "Hệ thống thi trắc nghiệm online trên điện thoại",
+  "private": true,
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}
